@@ -45,13 +45,13 @@ const Header = () => {
           About
         </Link>
         <Link to="/contact" className="text-xl px-4">
-          Contact
+          Contaact
         </Link>
 
         {/* ✅ Show GetContact link ONLY if the user is an admin */}
         {authUser?.role === "admin" && (
           <Link to="/getContacts" className="text-xl px-4">
-            User Messages
+            Users Messages
           </Link>
         )}
 
