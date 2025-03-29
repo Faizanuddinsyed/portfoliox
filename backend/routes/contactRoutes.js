@@ -3,7 +3,7 @@ import {
   contactController,
   getContactController,
 } from "../controllers/contactController.js";
-import { requireSignIn } from "../middlewares/authMiddleware.js";
+import { requireSignIn, verifyAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
