@@ -1,8 +1,7 @@
-
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-// ✅ Define AuthContext at the top
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -11,6 +10,34 @@ export const AuthProvider = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
+  const navigate = useNavigate();
+
+  // ✅ Reusable function to fetch user data
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await axios.get("http://localhost:5000/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+
+      setAuthUser(response.data.user);
+    } catch (error) {
+      console.error("User not authenticated", error.message);
+      setAuthUser(null);
+      localStorage.removeItem("authUser");
+      localStorage.removeItem("token");
+    }
+  };
+
+  // ✅ Fetch user data on page load
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  // ✅ Update localStorage when authUser changes
   useEffect(() => {
     if (authUser) {
       localStorage.setItem("authUser", JSON.stringify(authUser));
@@ -19,20 +46,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [authUser]);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/auth/me", {
-          withCredentials: true,
-        });
-        setAuthUser(response.data.user);
-      } catch (error) {
-        console.log("User not authenticated", error.message);
-      }
-    };
-    fetchUser();
-  }, []);
-
+  // ✅ Login function: Save token and fetch user immediately
   const login = async (formData) => {
     try {
       const response = await axios.post(
@@ -40,7 +54,13 @@ export const AuthProvider = ({ children }) => {
         formData,
         { withCredentials: true }
       );
-      setAuthUser(response.data.user);
+
+      const { token, user } = response.data;
+      localStorage.setItem("token", token);
+
+      await fetchUser(); // ✅ Fetch user immediately after login
+
+      navigate("/"); // ✅ Redirect to dashboard after login
       return response.data.success;
     } catch (error) {
       console.error("Login failed:", error.message);
@@ -48,17 +68,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // ✅ Logout function: Remove user and token from storage & redirect
   const logout = async () => {
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/auth/logout",
         {},
         { withCredentials: true }
       );
-      if (response.status === 200) {
-        setAuthUser(null);
-        console.log("User logged out successfully");
-      }
+
+      setAuthUser(null);
+      localStorage.removeItem("authUser");
+      localStorage.removeItem("token");
+
+      navigate("/login"); // ✅ Redirect to login after logout
+      console.log("User logged out successfully");
     } catch (error) {
       console.error("Logout failed:", error.message);
     }
@@ -71,5 +95,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// ✅ Ensure correct export
+// ✅ Hook to use AuthContext in other components
 export const useAuth = () => useContext(AuthContext);

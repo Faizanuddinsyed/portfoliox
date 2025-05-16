@@ -21,6 +21,7 @@ const Login = () => {
       setAuthUser(userData);
       alert("Login successful!");
       navigate("/");
+      window.location.reload();
     } catch (err) {
       setError("Login failed: " + err.message);
     }

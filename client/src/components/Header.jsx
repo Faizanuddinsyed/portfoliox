@@ -45,7 +45,7 @@ const Header = () => {
           About
         </Link>
         <Link to="/contact" className="text-xl px-4">
-          Contaact
+          Contact
         </Link>
 
         {/* ✅ Show GetContact link ONLY if the user is an admin */}
