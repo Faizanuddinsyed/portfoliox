@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <header className="bg-gray-900 text-white p-4 flex justify-between items-center">
       <Link to="/">
-        <h1 className="text-2xl font-bold">My Portfolio</h1>
+        <h1 className="text-2xl text-yellow-500 font-bold">My Portfolio</h1>
       </Link>
 
       {/* Mobile Menu Button */}
@@ -51,7 +51,7 @@ const Header = () => {
         {/* ✅ Show GetContact link ONLY if the user is an admin */}
         {authUser?.role === "admin" && (
           <Link to="/getContacts" className="text-xl px-4">
-            User Messages
+            Users Messages
           </Link>
         )}
 
